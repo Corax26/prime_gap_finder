@@ -9,6 +9,49 @@
 namespace
 {
 
+GapInfo find_max_gap_range(Int start, Int end, Int delta,
+                           const PrimeList &prime_list)
+{
+    GapInfo res;
+    Int base = start;
+
+    GapInfo prev_info;
+    {
+        Sieve sieve = compute_sieve(base, delta, prime_list);
+        prev_info = find_max_gap(sieve);
+        res.max_gap = prev_info.max_gap;
+        res.max_p = base + prev_info.max_p;
+        res.lower_p = base + prev_info.lower_p;
+    }
+
+    GapInfo cur_info;
+    for (base += delta; base < end; base += delta)
+    {
+        Int size = std::min(delta, end - base);
+        Sieve sieve = compute_sieve(base, size, prime_list);
+        cur_info = find_max_gap(sieve);
+
+        if (cur_info.max_gap > res.max_gap)
+        {
+            res.max_gap = cur_info.max_gap;
+            res.max_p = base + cur_info.max_p;
+        }
+
+        Int delta_gap = delta + cur_info.lower_p - prev_info.upper_p;
+        if (delta_gap > res.max_gap)
+        {
+            res.max_gap = delta_gap;
+            res.max_p = base - delta + prev_info.upper_p;
+        }
+
+        prev_info = cur_info;
+    }
+
+    res.upper_p = cur_info.upper_p;
+
+    return res;
+}
+
 std::tuple<Int, Int> prime_gap_finder(Int limit)
 {
     if (limit == 5)
@@ -21,39 +64,9 @@ std::tuple<Int, Int> prime_gap_finder(Int limit)
     // We assume the biggest gap won't be in the first sqrt(limit)
     PrimeList prime_list = get_primes(delta);
 
-    Int base = delta + 1;
-    GapInfo prev_gap_info;
-    Int max_gap, max_p;
-    {
-        Sieve sieve = compute_sieve(base, delta, prime_list);
-        prev_gap_info = find_max_gap(sieve);
-        max_gap = prev_gap_info.max_gap;
-        max_p = prev_gap_info.max_p;
-    }
+    GapInfo gap_info = find_max_gap_range(delta + 1, limit, delta, prime_list);
 
-    for (base += delta; base < limit; base += delta)
-    {
-        Int size = std::min(delta, limit - base);
-        Sieve sieve = compute_sieve(base, size, prime_list);
-        GapInfo gap_info = find_max_gap(sieve);
-
-        if (gap_info.max_gap > max_gap)
-        {
-            max_gap = gap_info.max_gap;
-            max_p = base + gap_info.max_p;
-        }
-
-        Int delta_gap = delta + gap_info.lower_p - prev_gap_info.upper_p;
-        if (delta_gap > max_gap)
-        {
-            max_gap = delta_gap;
-            max_p = base - delta + prev_gap_info.upper_p;
-        }
-
-        prev_gap_info = gap_info;
-    }
-    
-    return {max_gap, max_p};
+    return {gap_info.max_gap, gap_info.max_p};
 }
 
 }
@@ -81,9 +94,9 @@ int main(int argc, char **argv)
         std::tie(max_gap, max_p) = prime_gap_finder(limit);
     }
 
-    std::cout << "Max gap is " << max_gap << ", between " 
+    std::cout << "Max gap is " << max_gap << ", between "
               << max_p << " and " << max_p + max_gap << std::endl;
-    std::cout << "Max seq is " << max_gap - 1 << ", between " 
+    std::cout << "Max seq is " << max_gap - 1 << ", between "
               << max_p + 1 << " and " << max_p + max_gap - 1 << std::endl;
 
     return 0;
