@@ -20,7 +20,7 @@ OBJS += $(patsubst %.cpp,$(BUILDDIR)/%.o, $(CXX_FILES))
 
 .PHONY: all debug release clean
 
-all:			debug
+all:			release
 debug: 			build
 release: 		build
 prof:			build

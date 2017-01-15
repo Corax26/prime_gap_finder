@@ -28,7 +28,10 @@ struct GapInfo
     Int max_p;
     Int lower_p;
     Int upper_p;
+
+    void shift(Int base) { max_p += base; lower_p += base; upper_p += base; }
 };
+std::ostream& operator<<(std::ostream &o, const GapInfo &gap_info);
 
 PrimeList get_primes(Int n);
 

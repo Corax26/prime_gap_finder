@@ -5,6 +5,12 @@
 
 #include "prime.h"
 
+std::ostream& operator<<(std::ostream &o, const GapInfo &gap_info)
+{
+    return o << "(" << gap_info.max_gap << ", " << gap_info.max_p << ") ("
+             << gap_info.lower_p << ", " << gap_info.upper_p << ")";
+}
+
 PrimeList get_primes(Int n)
 {
     Sieve sieve{n+1};
