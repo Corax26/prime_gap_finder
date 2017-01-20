@@ -18,8 +18,15 @@ public:
     Sieve(size_t n)
         : V(n, Prime) {}
 
-    using V::operator[];
     using V::size;
+
+    void mark_composite(Int i) { operator[](i) = !Prime; }
+
+    Int next_prime(Int i) const
+    {
+        while (i < size() && operator[](i) != Prime) ++i;
+        return i;
+    }
 };
 
 struct GapInfo
