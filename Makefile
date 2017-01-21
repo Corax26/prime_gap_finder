@@ -12,7 +12,8 @@ CXXFLAGS 	= -std=c++11 \
 			  -Wall -Wextra \
 			  -I$(SRCDIR) \
 			  -pthread \
-			  -MMD
+			  -MMD \
+			  $(if $(SIEVE_IMPL),-DSIEVE_IMPL=$(SIEVE_IMPL))
 LDFLAGS		= -pthread
 LDLIBS 		=
 

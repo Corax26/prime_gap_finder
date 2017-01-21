@@ -1,33 +1,15 @@
+#ifndef PRIME_H_
+#define PRIME_H_
+
 #include <tuple>
 #include <vector>
 
 #include <cstddef>
 #include <cstdint>
 
-using Int = uint32_t;
+#include "sieve.h"
+
 using PrimeList = std::vector<Int>;
-
-// false = prime, true = non-prime (not very intuitive but this allows to
-// zero-init the array)
-static constexpr bool Prime = false;
-
-class Sieve : private std::vector<bool>
-{
-    using V = std::vector<bool>;
-public:
-    Sieve(size_t n)
-        : V(n, Prime) {}
-
-    using V::size;
-
-    void mark_composite(Int i) { operator[](i) = !Prime; }
-
-    Int next_prime(Int i) const
-    {
-        while (i < size() && operator[](i) != Prime) ++i;
-        return i;
-    }
-};
 
 struct GapInfo
 {
@@ -45,3 +27,5 @@ PrimeList get_primes(Int n);
 Sieve compute_sieve(Int start, Int n, const PrimeList &primes);
 
 GapInfo find_max_gap(const Sieve &sieve);
+
+#endif // PRIME_H_
