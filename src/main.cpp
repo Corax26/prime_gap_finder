@@ -31,9 +31,11 @@ GapInfo find_max_gap_range(Int start, Int end, Int delta,
 
     GapInfo cur_info;
     cur_info.upper_p = prev_info.upper_p;
-    for (base += delta; base < end; base += delta)
+    for (base += delta; base + delta - 1 < end; base += delta)
     {
-        Int size = std::min(delta, end - base);
+        // The last iteration is at least delta in size, plus the last numbers
+        // if end - base is not a multiple of delta.
+        Int size = (end - base < 2 * delta ? end - base : delta);
         Sieve sieve = compute_sieve(base, size, prime_list);
         cur_info = find_max_gap(sieve);
         cur_info.shift(base);
@@ -96,7 +98,8 @@ std::tuple<Int, Int> prime_gap_finder(Int limit, unsigned nb_threads,
         {
             threads.emplace_back(worker_thread,
                                  start + i * thread_delta,
-                                 std::min(start + (i + 1) * thread_delta, end),
+                                 (i == nb_threads - 1
+                                  ? end : start + (i + 1) * thread_delta),
                                  delta * delta_multiplier,
                                  std::cref(prime_list),
                                  std::ref(gap_infos[i]));
@@ -192,10 +195,8 @@ int main(int argc, char **argv)
                                                     delta_multiplier);
     }
 
-    std::cout << "Max gap is " << max_gap << ", between "
+    std::cout << "Max seq of non-primes was " << max_gap - 1 << ", between "
               << max_p << " and " << max_p + max_gap << std::endl;
-    std::cout << "Max seq is " << max_gap - 1 << ", between "
-              << max_p + 1 << " and " << max_p + max_gap - 1 << std::endl;
 
     return 0;
 }
