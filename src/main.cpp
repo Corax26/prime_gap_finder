@@ -72,7 +72,7 @@ std::tuple<Int, Int> prime_gap_finder(Int limit, unsigned nb_threads,
 {
     if (limit == 5)
     {
-        return {2, 3};
+        return std::make_tuple(2, 3);
     }
 
     auto delta = static_cast<Int>(sqrt(limit));
@@ -140,7 +140,7 @@ std::tuple<Int, Int> prime_gap_finder(Int limit, unsigned nb_threads,
         res = find_max_gap_range(start, end, delta, prime_list);
     }
 
-    return {res.max_gap, res.max_p};
+    return std::make_tuple(res.max_gap, res.max_p);
 }
 
 void usage(const char *program_name)
